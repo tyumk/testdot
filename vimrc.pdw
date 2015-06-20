@@ -1,0 +1,275 @@
+set nocompatible
+scriptencoding utf-8
+syntax on
+" set cursorline
+set expandtab
+set tabstop=4
+set shiftwidth=4
+let &t_ti.="\e[1 q"
+let &t_SI.="\e[5 q"
+let &t_EI.="\e[1 q"
+let &t_te.="\e[0 q"
+
+" カーソル移動
+noremap h <Left>zv
+noremap k gj
+noremap j gk
+noremap l <Right>zv
+noremap <Down> gj
+noremap <Up>   gk
+noremap [ ^
+noremap ] <End>
+noremap J 20gk
+noremap H 10<Left>
+noremap K 20gj
+noremap L 10<Right>
+
+inoremap <C-j> <Up>
+inoremap <C-h> <Left>
+inoremap <C-k> <Down>
+inoremap <C-l> <Right>
+inoremap <C-[> <Home>
+inoremap <C-]> <End>
+inoremap <C-d> <Del>
+inoremap <C-u> <left><del>
+
+inoremap <C-a> <ESC>
+noremap s i
+noremap S I
+
+" 置換
+noremap t r
+noremap T R
+
+" 単語
+noremap r b
+noremap R B
+
+" 念のため
+noremap c y
+noremap C Y
+
+" スクロール
+noremap <CR> <C-f>
+noremap <BS> <C-b>
+noremap <s-tAB> <C-y>
+noremap <TAB> <C-e>
+
+" カーソル位置の単語選択
+noremap o viw
+
+"----------------------------------------
+" エンコーディング指定
+"----------------------------------------
+" vimの内部エンコーディング指定
+set encoding=utf-8
+" 既存ファイルを開くためのエンコーディング指定（先頭ほど優先順位高）
+set fileencodings=utf-8,cp932,sjis,ucs-bom,iso-2022-jp-3,iso-2022-jp,eucjp-ms,euc-jisx0213
+" 新規ファイルのエンコーディング指定
+set fileencoding=utf-8
+
+"----------------------------------------
+" システム設定
+"----------------------------------------
+" ファイルの上書きの前にバックアップを作る/作らない
+" set writebackupを指定してもオプション 'backup' がオンでない限り、
+" バックアップは上書きに成功した後に削除される。
+set writebackup
+" バックアップ/スワップファイルを作成する/しない
+set backup
+set swapfile
+
+set directory=~/.vim/temp
+set backupdir=~/.vim/temp
+
+" クリップボードを共有
+set clipboard=unnamed,autoselect
+" Visual blockモードでフリーカーソルを有効にする :: 空行で引っ込まない
+set virtualedit=block
+" カーソルキーで行末／行頭の移動可能に設定
+set whichwrap=b,s,[,],<,>
+" バックスペースでインデントや改行を削除できるようにする
+set backspace=indent,eol,start
+" コマンドライン補完するときに強化されたものを使う ::コマンドの上のラインに表示されるあれ
+set wildmenu
+" マウスを有効にする
+"if has('mouse')
+"    set mouse=a
+"endif
+" pluginを使用可能にする
+filetype plugin indent on
+
+"----------------------------------------
+" 検索
+"----------------------------------------
+" 検索の時に大文字小文字を区別しない
+" ただし大文字小文字の両方が含まれている場合は大文字小文字を区別する
+set ignorecase
+set smartcase
+" 検索時にファイルの最後まで行ったら最初に戻る
+set wrapscan
+" インクリメンタルサーチ
+set incsearch
+" 検索文字の強調表示
+set hlsearch
+" w,bの移動で認識する文字
+" set iskeyword=a-z,A-Z,48-57,_,.,-,>
+" vimgrep をデフォルトのgrepとする場合internal
+" set grepprg=internal
+
+"----------------------------------------
+" 表示設定
+"----------------------------------------
+" スプラッシュ(起動時のメッセージ)を表示しない
+" set shortmess+=I
+" エラー時の音とビジュアルベルの抑制(gvimは.gvimrcで設定)
+set noerrorbells
+set novisualbell
+set visualbell t_vb=
+" マクロ実行中などの画面再描画を行わない
+" set lazyredraw
+" Windowsでディレクトリパスの区切り文字表示に / を使えるようにする
+"set shellslash "vundleを使うときエラー
+" 行番号表示
+set number
+"if version >= 703
+    " 相対行番号表示(7.3)
+    " set relativenumber
+"endif
+" 括弧の対応表示時間
+"set showmatch matchtime=1
+" タブを設定
+" set ts=4 sw=4 sts=4
+" 自動的にインデントする
+set autoindent
+" Cインデントの設定
+set cinoptions+=:0
+" タイトルを表示
+set title
+" コマンドラインの高さ (gvimはgvimrcで指定)
+" set cmdheight=2
+set laststatus=2
+" コマンドをステータス行に表示
+"set showcmd
+" 画面最後の行をできる限り表示する
+set display=lastline
+" Tab、行末の半角スペースを明示的に表示する
+set list
+set listchars=tab:^\ ,trail:~
+" ルーラー（右下に表示される行・列の番号）を表示する
+set ruler
+" シェルに渡すコマンドを囲む引用符
+"set shellxquote=
+
+""""""""""""""""""""""""""""""
+" ステータスラインに文字コード等表示
+" iconvが使用可能の場合、カーソル上の文字コードをエンコードに応じた表示にするFencB()を使用
+""""""""""""""""""""""""""""""
+if has('iconv')
+    set statusline=%<%f\ %m\ %r%h%w%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=[0x%{FencB()}]\ (%v,%l)/%L%8P\ 
+else
+    set statusline=%<%f\ %m\ %r%h%w%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=\ (%v,%l)/%L%8P\ 
+endif
+
+" FencB() : カーソル上の文字コードをエンコードに応じた表示にする
+function! FencB()
+    let c = matchstr(getline('.'), '.', col('.') - 1)
+    let c = iconv(c, &enc, &fenc)
+    return s:Byte2hex(s:Str2byte(c))
+endfunction
+
+function! s:Str2byte(str)
+    return map(range(len(a:str)), 'char2nr(a:str[v:val])')
+endfunction
+
+function! s:Byte2hex(bytes)
+    return join(map(copy(a:bytes), 'printf("%02X", v:val)'), '')
+endfunction
+
+""""""""""""""""""""""""""""""
+" 挿入モード時、ステータスラインのカラー変更
+""""""""""""""""""""""""""""""
+let g:hi_insert = 'highlight StatusLine guifg=darkblue guibg=darkyellow gui=none ctermfg=blue ctermbg=yellow cterm=none'
+
+if has('syntax')
+    augroup InsertHook
+        autocmd!
+        autocmd InsertEnter * call s:StatusLine('Enter')
+        autocmd InsertLeave * call s:StatusLine('Leave')
+    augroup END
+endif
+" if has('unix') && !has('gui_running')
+"   " ESCですぐに反映されない対策
+"   inoremap <silent> <ESC> <ESC>
+" endif
+
+let s:slhlcmd = ''
+function! s:StatusLine(mode)
+    if a:mode == 'Enter'
+        silent! let s:slhlcmd = 'highlight ' . s:GetHighlight('StatusLine')
+        silent exec g:hi_insert
+    else
+        highlight clear StatusLine
+        silent exec s:slhlcmd
+        redraw
+    endif
+endfunction
+
+function! s:GetHighlight(hi)
+    redir => hl
+    exec 'highlight '.a:hi
+    redir END
+    let hl = substitute(hl, '[\r\n]', '', 'g')
+    let hl = substitute(hl, 'xxx', '', '')
+    return hl
+endfunction
+
+" read local vimrc file
+if filereadable($HOME."/.vimrc_local")
+    source $HOME/.vimrc_local
+endif
+
+" ---------------------------------------------------------
+" コメントアウト Space , c でコメントをつけたり消したり
+" ---------------------------------------------------------
+map <Space>c <Plug>(caw:I:toggle)
+
+" ---------------------------------------------------------
+" Unite
+" ---------------------------------------------------------
+" The prefix key.
+nnoremap    [unite]   <Nop>
+nmap    <Space> [unite]
+
+nnoremap <silent> [unite]b  :<C-u>Unite buffer<CR>
+nnoremap <silent> [unite]f  :<C-u>Unite file<CR>
+nnoremap <silent> [unite]o  :<C-u>Unite outline<CR>
+nnoremap <silent> [unite]d  :<C-u>Unite directory<CR>
+nnoremap <silent> [unite]m  :<C-u>Unite neomru/file<CR>
+nnoremap <silent> [unite]t  :<C-u>Unite tab<CR>
+nnoremap <silent> [unite]j  :<C-u>Unite jump<CR>
+nnoremap <silent> [unite]g  :<C-u>Unite vimgrep<CR>
+" nnoremap <silent> [unite]d  :<C-u>UniteWithCurrentDir
+"         \ -buffer-name=files buffer bookmark file<CR>
+" nnoremap <silent> [unite]b  :<C-u>UniteWithBufferDir
+"         \ -buffer-name=files -prompt=%\  buffer bookmark file<CR>
+nnoremap <silent> [unite]r  :<C-u>Unite
+        \ -buffer-name=register register<CR>
+
+" Unite 実行中のキーマップ
+autocmd FileType unite call s:unite_my_settings()
+    function! s:unite_my_settings()"{{{
+      " Overwrite settings.
+      nnoremap <buffer> j k
+      nnoremap <buffer> k j
+      " Runs "split" action by <C-s>.
+      map <silent><buffer><expr> <C-s>     unite#do_action('split')
+      map <silent><buffer><expr> <C-t>     unite#do_action('tabopen')
+      map <silent><buffer><expr> <C-d>     unite#do_action('cd')
+    endfunction"}}}
+
+" mkdir -p .vim/plugin, autoload, doc, temp
+" wget https:// ....tar.gz
+" tar xf master...tar.gz
+" autoload, plugin, doc -> cp
+" :helptags ~/.vim/doc.
