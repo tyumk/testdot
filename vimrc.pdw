@@ -2,7 +2,7 @@ set nocompatible
 scriptencoding utf-8
 syntax on
 " set cursorline
-set expandtab
+" set expandtab
 set tabstop=4
 set shiftwidth=4
 let &t_ti.="\e[1 q"
@@ -11,43 +11,42 @@ let &t_EI.="\e[1 q"
 let &t_te.="\e[0 q"
 
 " カーソル移動
-noremap h <Left>zv
+noremap j <Left>zv
 noremap k gj
-noremap j gk
+noremap i gk
 noremap l <Right>zv
 noremap <Down> gj
 noremap <Up>   gk
-noremap [ ^
-noremap ] <End>
-noremap J 20gk
-noremap H 10<Left>
+noremap h ^
+noremap e <End>
+noremap I 20gk
+noremap J 10<Left>
 noremap K 20gj
 noremap L 10<Right>
 
-inoremap <C-j> <Up>
-inoremap <C-h> <Left>
+inoremap <C-i> <Up>
+inoremap <C-j> <Left>
 inoremap <C-k> <Down>
 inoremap <C-l> <Right>
-inoremap <C-[> <Home>
-inoremap <C-]> <End>
+" inoremap <C-h> <Home>
+inoremap <C-e> <End>
 inoremap <C-d> <Del>
-inoremap <C-u> <left><del>
 
-inoremap <C-a> <ESC>
+inoremap <C-s> <ESC>
 noremap s i
 noremap S I
 
-" 置換
 noremap t r
 noremap T R
 
-" 単語
 noremap r b
 noremap R B
 
-" 念のため
 noremap c y
 noremap C Y
+
+noremap y t
+noremap Y T
 
 " スクロール
 noremap <CR> <C-f>
@@ -57,6 +56,18 @@ noremap <TAB> <C-e>
 
 " カーソル位置の単語選択
 noremap o viw
+
+" タブで開く
+noremap <C-t> <C-w>gf
+
+" surround
+vnoremap <Space>s d<Left><Left>p<Right>xx
+vnoremap <Space>" di""<Esc><Left>p
+vnoremap <Space>( di()<Esc><Left>p
+vnoremap <Space>[ di[]<Esc><Left>p
+vnoremap <Space>{ di{}<Esc><Left>p
+vnoremap <Space>' di''<Esc><Left>p
+vnoremap <Space>` di``<Esc><Left>p
 
 "----------------------------------------
 " エンコーディング指定
@@ -77,7 +88,6 @@ set fileencoding=utf-8
 set writebackup
 " バックアップ/スワップファイルを作成する/しない
 set backup
-set swapfile
 
 set directory=~/.vim/temp
 set backupdir=~/.vim/temp
@@ -224,19 +234,18 @@ function! s:GetHighlight(hi)
     return hl
 endfunction
 
-" read local vimrc file
-if filereadable($HOME."/.vimrc_local")
-    source $HOME/.vimrc_local
-endif
-
 " ---------------------------------------------------------
-" コメントアウト Space , c でコメントをつけたり消したり
+" caw
 " ---------------------------------------------------------
+" NeoBundle 'tyru/caw.vim'
 map <Space>c <Plug>(caw:I:toggle)
 
 " ---------------------------------------------------------
 " Unite
 " ---------------------------------------------------------
+" NeoBundle 'Shougo/unite.vim'
+" NeoBundle 'Shougo/neomru.vim'
+" NeoBundle 'Shougo/unite-outline'
 " The prefix key.
 nnoremap    [unite]   <Nop>
 nmap    <Space> [unite]
@@ -268,8 +277,77 @@ autocmd FileType unite call s:unite_my_settings()
       map <silent><buffer><expr> <C-d>     unite#do_action('cd')
     endfunction"}}}
 
-" mkdir -p .vim/plugin, autoload, doc, temp
-" wget https:// ....tar.gz
-" tar xf master...tar.gz
-" autoload, plugin, doc -> cp
-" :helptags ~/.vim/doc.
+" ---------------------------------------------------------
+" VimFiler
+" ---------------------------------------------------------
+NeoBundle 'Shougo/vimfiler.vim'
+noremap <Space>f :VimFiler<Enter>
+noremap <Space>e :VimFilerExplorer<Enter>
+" VimFiler 実行中のキーマップ
+autocmd FileType vimfiler call s:vimfiler_my_settings()
+    function! s:vimfiler_my_settings()"{{{
+      " Overwrite settings.
+      nnoremap <buffer> j k
+      nnoremap <buffer> k j
+      " Runs "split" action by <C-s>.
+      map <silent><buffer><expr> <C-s>     vimfiler#do_action('split')
+      map <silent><buffer><expr> <C-t>     vimfiler#do_action('tabopen')
+      map <silent><buffer><expr> <C-d>     vimfiler#do_action('cd')
+    endfunction"}}}
+
+" ---------------------------------------------------------
+" ヘルプ日本語化
+" ---------------------------------------------------------
+" NeoBundle 'vim-jp/vimdoc-ja'
+
+" read local vimrc file
+if filereadable($HOME."/.vimrc_local")
+    source $HOME/.vimrc_local
+endif
+
+
+
+" ---------------------------------------------------------
+" clang_complete
+" ---------------------------------------------------------
+" NeoBundleLazy 'Rip-Rip/clang_complete', {
+"             \ 'autoload' : {'filetypes' : ['c', 'cpp']}
+"             \ }
+" " autocmd FileType cpp call s:cpp()
+" " function! s:cpp()
+" "     let g:clang_complete_auto=1
+" "     let g:clang_use_library=0
+" "     let g:clang_snippets=0
+" "     let g:clang_complete_copen = 1
+" " endfunction
+"
+" let g:clan_exec='clang.exe'
+" let g:clang_close_preview = 1
+" let g:clang_auto_select = 0
+" " let g:clang_user_options='-I /usr/local/include -I /usr/local/gcc-4.8.2/include/c++/4.8.2 || exit 0'
+" let g:clang_user_options='-I D:/yuki/include -I D:/yuki/include_cpp || exit 0'
+" " ---------------------------------------------------------
+" " snippet
+" " ---------------------------------------------------------
+" " NeoBundle 'Shougo/neosnippet'
+" " NeoBundle 'Shougo/neosnippet-snippets'
+" " " スニペットを展開するキーマッピング
+" " " <Tab> で選択されているスニペットの展開を行う
+" " " 選択されている候補がスニペットであれば展開し、
+" " " それ以外であれば次の候補を選択する
+" " " また、既にスニペットが展開されている場合は次のマークへと移動する
+" " imap <expr><CR> neosnippet#expandable_or_jumpable() ?
+" " \ "\<Plug>(neosnippet_expand_or_jump)"
+" " \: "\<CR>"
+" " " \: pumvisible() ? "\<C-n>" : "\<CR>"
+" " smap <expr><CR> neosnippet#expandable_or_jumpable() ?
+" " \ "\<Plug>(neosnippet_expand_or_jump)"
+" " \: "\<CR>"
+" "
+" " " 現在の filetype のスニペットを編集する為のキーマッピング
+" " " こうしておくことでサッと編集や追加などを行うことができる
+" " " 以下の設定では新しいタブでスニペットファイルを開く
+" " " nnoremap <Space>ns :execute "tabnew\|:NeoSnippetEdit ".&filetype<CR>
+" "
+" " " スニペットファイルの保存ディレクトリを設定
+" " " let g:neosnippet#snippets_directory = "~/.neosnippet"
