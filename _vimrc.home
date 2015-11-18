@@ -1,0 +1,713 @@
+set nocompatible
+scriptencoding utf-8
+syntax on
+" set cursorline
+" set expandtab
+set tabstop=4
+set shiftwidth=4
+let &t_ti.="\e[1 q"
+let &t_SI.="\e[5 q"
+let &t_EI.="\e[1 q"
+let &t_te.="\e[0 q"
+
+"---------------------------------------------------------------------
+" キーマップ
+" (Vim特有のキーバインドを尊重しつつ、Windowsベースの操作も可能にする)
+" ---------------------------------------------------------------------
+
+" カーソル移動
+noremap j <Left>zv
+noremap k gj
+noremap i gk
+noremap l <Right>zv
+noremap <Down> gj
+noremap <Up>   gk
+noremap h ^
+noremap e <End>
+" noremap <C-i> 20gk
+" noremap <C-j> 10<Left>
+" noremap <C-k> 20gj
+" noremap <C-l> 10<Right>
+noremap I 20gk
+noremap J 10<Left>
+noremap K 20gj
+noremap L 10<Right>
+
+inoremap <C-i> <Up>
+inoremap <C-j> <Left>
+inoremap <C-k> <Down>
+inoremap <C-l> <Right>
+" backspaceと競合
+" inoremap <C-h> <Home>
+inoremap <C-e> <End>
+inoremap <C-d> <Del>
+
+" ノーマルモード <=> 挿入モードの行き来 (s系の削除して挿入モード移行禁止)
+inoremap <C-s> <ESC>
+noremap s i
+noremap S I
+
+" 置換モード
+noremap t r
+noremap T R
+
+" r, e の2つで単語単位のカーソル移動
+noremap r b
+noremap R B
+
+" コピー：ヤンク
+noremap c y
+noremap C Y
+noremap <C-c> <C-v>
+
+" 指定文字の直前-直後まで移動
+noremap y t
+noremap Y T
+
+" スクロール
+noremap <CR> <C-f>
+noremap <BS> <C-b>
+noremap <s-tAB> <C-y>
+noremap <TAB> <C-e>
+
+" shift + tab で 後方補完
+" inoremap <S-TAB> <C-n>
+"inoremap <TAB> <TAB> " <TAB> と <C-i> は区別が付けられない、とのこと
+
+" カーソル位置の単語選択
+noremap o viw
+" 括弧内を選択
+" noremap <C-a> vib
+
+" タブで開く
+noremap <C-t> <C-w>gf
+
+"----------------------------------------
+" vimfilesのpath
+"----------------------------------------
+if isdirectory($HOME.'/.vim')
+    let $VIMFILES = $HOME.'/.vim'
+elseif isdirectory($HOME.'\vimfiles')
+    let $VIMFILES = $HOME.'\vimfiles'
+elseif isdirectory($VIM.'\vimfiles')
+    let $VIMFILES = $VIM.'\vimfiles'
+endif
+
+"----------------------------------------
+" エンコーディング指定
+"----------------------------------------
+" vimの内部エンコーディング指定
+set encoding=utf-8
+" 既存ファイルを開くためのエンコーディング指定（先頭ほど優先順位高）
+set fileencodings=utf-8,cp932,sjis,ucs-bom,iso-2022-jp-3,iso-2022-jp,eucjp-ms,euc-jisx0213
+" 新規ファイルのエンコーディング指定
+set fileencoding=utf-8
+
+"----------------------------------------
+" システム設定
+"----------------------------------------
+" ファイルの上書きの前にバックアップを作る/作らない
+" set writebackupを指定してもオプション 'backup' がオンでない限り、
+" バックアップは上書きに成功した後に削除される。
+set writebackup
+" バックアップ/スワップファイルを作成する/しない
+set nobackup
+
+set directory=$VIMFILES/vim_swap
+set backupdir=$VIMFILES/vim_backup
+
+" クリップボードを共有
+set clipboard=unnamed,autoselect
+" Visual blockモードでフリーカーソルを有効にする :: 空行で引っ込まない
+set virtualedit=block
+" カーソルキーで行末／行頭の移動可能に設定
+set whichwrap=b,s,[,],<,>
+" バックスペースでインデントや改行を削除できるようにする
+set backspace=indent,eol,start
+" コマンドライン補完するときに強化されたものを使う ::コマンドの上のラインに表示されるあれ
+set wildmenu
+" マウスを有効にする
+"if has('mouse')
+"    set mouse=a
+"endif
+" pluginを使用可能にする
+filetype plugin indent on
+
+"----------------------------------------
+" 検索
+"----------------------------------------
+" 検索の時に大文字小文字を区別しない
+" ただし大文字小文字の両方が含まれている場合は大文字小文字を区別する
+set ignorecase
+set smartcase
+" 検索時にファイルの最後まで行ったら最初に戻る
+set wrapscan
+" インクリメンタルサーチ
+set incsearch
+" 検索文字の強調表示
+set hlsearch
+" w,bの移動で認識する文字
+" set iskeyword=a-z,A-Z,48-57,_,.,-,>
+" vimgrep をデフォルトのgrepとする場合internal
+" set grepprg=internal
+
+"----------------------------------------
+" 表示設定
+"----------------------------------------
+" スプラッシュ(起動時のメッセージ)を表示しない
+" set shortmess+=I
+" エラー時の音とビジュアルベルの抑制(gvimは.gvimrcで設定)
+set noerrorbells
+set novisualbell
+set visualbell t_vb=
+" マクロ実行中などの画面再描画を行わない
+" set lazyredraw
+" Windowsでディレクトリパスの区切り文字表示に / を使えるようにする
+"set shellslash "vundleを使うときエラー
+" 行番号表示
+set number
+"if version >= 703
+    " 相対行番号表示(7.3)
+    " set relativenumber
+"endif
+" 括弧の対応表示時間
+"set showmatch matchtime=1
+" タブを設定
+" set ts=4 sw=4 sts=4
+" 自動的にインデントする
+set autoindent
+" Cインデントの設定
+set cinoptions+=:0
+" タイトルを表示
+set title
+" コマンドラインの高さ (gvimはgvimrcで指定)
+" set cmdheight=2
+set laststatus=2
+" コマンドをステータス行に表示
+"set showcmd
+" 画面最後の行をできる限り表示する
+set display=lastline
+" Tab、行末の半角スペースを明示的に表示する
+set list
+set listchars=tab:^\ ,trail:~
+" ルーラー（右下に表示される行・列の番号）を表示する
+set ruler
+" シェルに渡すコマンドを囲む引用符
+"set shellxquote=
+
+""""""""""""""""""""""""""""""
+" ステータスラインに文字コード等表示
+" iconvが使用可能の場合、カーソル上の文字コードをエンコードに応じた表示にするFencB()を使用
+""""""""""""""""""""""""""""""
+if has('iconv')
+    set statusline=%<%f\ %m\ %r%h%w%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=[0x%{FencB()}]\ (%v,%l)/%L%8P\ 
+else
+    set statusline=%<%f\ %m\ %r%h%w%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=\ (%v,%l)/%L%8P\ 
+endif
+
+" FencB() : カーソル上の文字コードをエンコードに応じた表示にする
+function! FencB()
+    let c = matchstr(getline('.'), '.', col('.') - 1)
+    let c = iconv(c, &enc, &fenc)
+    return s:Byte2hex(s:Str2byte(c))
+endfunction
+
+function! s:Str2byte(str)
+    return map(range(len(a:str)), 'char2nr(a:str[v:val])')
+endfunction
+
+function! s:Byte2hex(bytes)
+    return join(map(copy(a:bytes), 'printf("%02X", v:val)'), '')
+endfunction
+
+"----------------------------------------
+" ノーマルモード
+"----------------------------------------
+" ヘルプ検索
+"nnoremap <F1> K
+" 現在開いているvimスクリプトファイルを実行
+"nnoremap <F8> :source %<CR>
+" 強制全保存終了を無効化
+"nnoremap ZZ <Nop>
+" カーソルをj k では表示行で移動する。物理行移動は<C-n>,<C-p>
+" キーボードマクロには物理行移動を推奨
+" h l は行末、行頭を超えることが可能に設定(whichwrap)
+"nnoremap <Down> gj
+"nnoremap <Up>   gk
+"nnoremap h <Left>zv
+"nnoremap j gj
+"nnoremap k gk
+"nnoremap l <Right>zv
+
+
+" ウインドウ移動を簡単に
+"nnoremap <C-h> <C-w>h
+"nnoremap <C-j> <C-w>j
+"nnoremap <C-k> <C-w>k
+"nnoremap <C-l> <C-w>l
+
+" 検索後、画面の中心に
+"nmap n nzz
+"nmap N Nzz
+
+""""""""""""""""""""""""""""""
+" 挿入モード時、ステータスラインのカラー変更
+""""""""""""""""""""""""""""""
+let g:hi_insert = 'highlight StatusLine guifg=darkblue guibg=darkyellow gui=none ctermfg=blue ctermbg=yellow cterm=none'
+
+if has('syntax')
+    augroup InsertHook
+        autocmd!
+        autocmd InsertEnter * call s:StatusLine('Enter')
+        autocmd InsertLeave * call s:StatusLine('Leave')
+    augroup END
+endif
+" if has('unix') && !has('gui_running')
+"   " ESCですぐに反映されない対策
+"   inoremap <silent> <ESC> <ESC>
+" endif
+
+let s:slhlcmd = ''
+function! s:StatusLine(mode)
+    if a:mode == 'Enter'
+        silent! let s:slhlcmd = 'highlight ' . s:GetHighlight('StatusLine')
+        silent exec g:hi_insert
+    else
+        highlight clear StatusLine
+        silent exec s:slhlcmd
+        redraw
+    endif
+endfunction
+
+function! s:GetHighlight(hi)
+    redir => hl
+    exec 'highlight '.a:hi
+    redir END
+    let hl = substitute(hl, '[\r\n]', '', 'g')
+    let hl = substitute(hl, 'xxx', '', '')
+    return hl
+endfunction
+
+"----------------------------------------
+"  Shougo/neobundle
+"----------------------------------------
+if has('vim_starting')
+   " Required:
+   set runtimepath+=~/.vim/bundle/neobundle.vim/
+endif
+
+" Required:
+call neobundle#begin(expand('~/.vim/bundle/'))
+
+" Let NeoBundle manage NeoBundle
+" Required:
+NeoBundleFetch 'Shougo/neobundle.vim'
+
+" -------------------------------------------------------------------
+" My Bundles here:
+" Refer to |:NeoBundle-examples|.
+" Note: You don't set neobundle setting in .gvimrc!
+
+" ---------------------------------------------------------
+" コメントアウト Space , c でコメントをつけたり消したり
+" ---------------------------------------------------------
+NeoBundle 'tyru/caw.vim'
+map <Space>c <Plug>(caw:I:toggle)
+
+" ---------------------------------------------------------
+" neocomplete 補完
+" ---------------------------------------------------------
+" NeoBundle 'Shougo/neocomplete'
+"
+" "Note: This option must set it in .vimrc(_vimrc).  NOT IN .gvimrc(_gvimrc)!
+" " Disable AutoComplPop.
+" let g:acp_enableAtStartup = 0
+" " Use neocomplete.
+" let g:neocomplete#enable_at_startup = 1
+" " Use smartcase.
+" let g:neocomplete#enable_smart_case = 1
+" " Set minimum syntax keyword length.
+" let g:neocomplete#sources#syntax#min_keyword_length = 3
+" let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
+"
+" " Define dictionary.
+" let g:neocomplete#sources#dictionary#dictionaries = {
+"     \ 'default' : '',
+"     \ 'vimshell' : $HOME.'/.vimshell_hist',
+"     \ 'scheme' : $HOME.'/.gosh_completions',
+"     \ 'ruby' : $HOME.'/.vim/dict/ruby.dict'
+"         \ }
+"
+" " Define keyword.
+" if !exists('g:neocomplete#keyword_patterns')
+"     let g:neocomplete#keyword_patterns = {}
+" endif
+" let g:neocomplete#keyword_patterns['default'] = '\h\w*'
+"
+" " Plugin key-mappings.
+" inoremap <expr><C-g>     neocomplete#undo_completion()
+" inoremap <expr><C-@>     neocomplete#complete_common_string()
+"
+" " Recommended key-mappings.
+" " <CR>: close popup and save indent.
+" inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+" function! s:my_cr_function()
+"   return neocomplete#close_popup() . "\<CR>"
+"   " For no inserting <CR> key.
+"   "return pumvisible() ? neocomplete#close_popup() : "\<CR>"
+" endfunction
+" " <TAB>: completion.
+" " inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+" " inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<S-TAB>"
+" " <C-h>, <BS>: close popup and delete backword char.
+" inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
+" inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
+" inoremap <expr><C-y>  neocomplete#close_popup()
+" inoremap <expr><C-e>  neocomplete#cancel_popup()
+" " Close popup by <Space>.
+" "inoremap <expr><Space> pumvisible() ? neocomplete#close_popup() : "\<Space>"
+"
+" " For cursor moving in insert mode(Not recommended)
+" "inoremap <expr><Left>  neocomplete#close_popup() . "\<Left>"
+" "inoremap <expr><Right> neocomplete#close_popup() . "\<Right>"
+" "inoremap <expr><Up>    neocomplete#close_popup() . "\<Up>"
+" "inoremap <expr><Down>  neocomplete#close_popup() . "\<Down>"
+" " Or set this.
+" "let g:neocomplete#enable_cursor_hold_i = 1
+" " Or set this.
+" "let g:neocomplete#enable_insert_char_pre = 1
+"
+" " AutoComplPop like behavior.
+" "let g:neocomplete#enable_auto_select = 1
+"
+" " Shell like behavior(not recommended).
+" "set completeopt+=longest
+" "let g:neocomplete#enable_auto_select = 1
+" "let g:neocomplete#disable_auto_complete = 1
+" "inoremap <expr><TAB>  pumvisible() ? "\<Down>" : "\<C-x>\<C-u>"
+"
+" " Enable omni completion.
+" " autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+" " autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+" " autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+" " autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+" " autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+"
+" " Enable heavy omni completion.
+" if !exists('g:neocomplete#sources#omni#input_patterns')
+"   let g:neocomplete#sources#omni#input_patterns = {}
+" endif
+" "let g:neocomplete#sources#omni#input_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
+" " let g:neocomplete#sources#omni#input_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
+" " let g:neocomplete#sources#omni#input_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
+" let g:neocomplete#sources#omni#input_patterns.ruby = '[^. *\t]\.\w*\|\h\w*::'
+" " For perlomni.vim setting.
+" " https://github.com/c9s/perlomni.vim
+" let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
+"
+" if !exists('g:neocomplete#force_omni_input_patterns')
+"   let g:neocomplete#force_omni_input_patterns = {}
+" endif
+" let g:neocomplete#force_overwrite_completefunc = 1
+" let g:neocomplete#force_omni_input_patterns.c =
+"       \ '[^.[:digit:] *\t]\%(\.\|->\)\w*'
+" let g:neocomplete#force_omni_input_patterns.cpp =
+"       \ '[^.[:digit:] *\t]\%(\.\|->\)\w*\|\h\w*::\w*'
+" " let g:neocomplete#force_omni_input_patterns.objc =
+" "       \ '\[\h\w*\s\h\?\|\h\w*\%(\.\|->\)'
+" " let g:neocomplete#force_omni_input_patterns.objcpp =
+" "       \ '\[\h\w*\s\h\?\|\h\w*\%(\.\|->\)\|\h\w*::\w*'
+
+" " ---------------------------------------------------------
+" " コードスニペット
+" " ---------------------------------------------------------
+" " NeoBundle 'Shougo/neosnippet'
+" " NeoBundle 'Shougo/neosnippet-snippets'
+" " " スニペットを展開するキーマッピング
+" " " <Tab> で選択されているスニペットの展開を行う
+" " " 選択されている候補がスニペットであれば展開し、
+" " " それ以外であれば次の候補を選択する
+" " " また、既にスニペットが展開されている場合は次のマークへと移動する
+" " imap <expr><CR> neosnippet#expandable_or_jumpable() ?
+" " \ "\<Plug>(neosnippet_expand_or_jump)"
+" " \: "\<CR>"
+" " " \: pumvisible() ? "\<C-n>" : "\<CR>"
+" " smap <expr><CR> neosnippet#expandable_or_jumpable() ?
+" " \ "\<Plug>(neosnippet_expand_or_jump)"
+" " \: "\<CR>"
+" "
+" " " 現在の filetype のスニペットを編集する為のキーマッピング
+" " " こうしておくことでサッと編集や追加などを行うことができる
+" " " 以下の設定では新しいタブでスニペットファイルを開く
+" " " nnoremap <Space>ns :execute "tabnew\|:NeoSnippetEdit ".&filetype<CR>
+" "
+" " " スニペットファイルの保存ディレクトリを設定
+" " " let g:neosnippet#snippets_directory = "~/.neosnippet"
+
+" ---------------------------------------------------------
+" 選択単語のハイライト
+" ---------------------------------------------------------
+" NeoBundle 't9md/vim-quickhl'
+" " <Space>m でカーソル下の単語、もしくは選択した範囲のハイライトを行う
+" " 再度 <Space>h を行うとカーソル下のハイライトを解除する
+" " これは複数の単語のハイライトを行う事もできる
+" " <Space>H で全てのハイライトを解除する
+" nmap <Space>h <Plug>(quickhl-manual-this)
+" xmap <Space>h <Plug>(quickhl-manual-this)
+" nmap <Space>H <Plug>(quickhl-manual-reset)
+" xmap <Space>H <Plug>(quickhl-manual-reset)
+
+" ---------------------------------------------------------
+" Vim Shell (Linuxだけ)
+" ---------------------------------------------------------
+" if has('unix')
+" if (1-has('win32unix'))
+"     NeoBundle 'Shougo/vimproc', {
+"                 \ 'build' : {
+"                 \     'windows' : 'tools\\update-dll-mingw',
+"                 \     'cygwin' : 'make -f make_cygwin.mak',
+"                 \     'mac' : 'make -f make_mac.mak',
+"                 \     'unix' : 'make -f make_unix.mak',
+"                 \    },
+"                 \ }
+"     NeoBundle 'Shougo/vimshell.vim'
+"     " カレントディレクトリの表示
+"     let g:vimshell_user_prompt = 'fnamemodify(getcwd(), ":~")'
+"     " Display user name
+"     if has('win32') || has('win64')
+"         let g:vimshell_prompt = $USERNAME."% "
+"     else
+"         let g:vimshell_prompt = $USER."% "
+"     endif
+"     " VimShell で alias
+"     autocmd FileType vimshell call vimshell#altercmd#define('ll', 'ls -l')
+"     " シェルを開く
+"     nnoremap <Space>s :VimShell -toggle -split -split-command=10sp<CR>
+"     nnoremap <Space>v :VimShell -toggle -split -split-command=vsp<CR>
+" endif
+" endif
+
+" ---------------------------------------------------------
+" Unite
+" ---------------------------------------------------------
+NeoBundle 'Shougo/unite.vim'
+NeoBundle 'Shougo/neomru.vim'
+NeoBundle 'Shougo/unite-outline'
+" The prefix key.
+nnoremap    [unite]   <Nop>
+nmap    <Space> [unite]
+
+nnoremap <silent> [unite]b  :<C-u>Unite buffer<CR>
+nnoremap <silent> [unite]f  :<C-u>Unite file<CR>
+nnoremap <silent> [unite]o  :<C-u>Unite outline<CR>
+nnoremap <silent> [unite]d  :<C-u>Unite directory<CR>
+nnoremap <silent> [unite]m  :<C-u>Unite neomru/file<CR>
+nnoremap <silent> [unite]t  :<C-u>Unite tab<CR>
+nnoremap <silent> [unite]j  :<C-u>Unite jump<CR>
+nnoremap <silent> [unite]g  :<C-u>Unite vimgrep<CR>
+" nnoremap <silent> [unite]d  :<C-u>UniteWithCurrentDir
+"         \ -buffer-name=files buffer bookmark file<CR>
+" nnoremap <silent> [unite]b  :<C-u>UniteWithBufferDir
+"         \ -buffer-name=files -prompt=%\  buffer bookmark file<CR>
+nnoremap <silent> [unite]r  :<C-u>Unite
+        \ -buffer-name=register register<CR>
+
+" Unite 実行中のキーマップ
+autocmd FileType unite call s:unite_my_settings()
+    function! s:unite_my_settings()"{{{
+      " Overwrite settings.
+      nnoremap <buffer> j k
+      nnoremap <buffer> k j
+      " Runs "split" action by <C-s>.
+      map <silent><buffer><expr> <C-s>     unite#do_action('split')
+      map <silent><buffer><expr> <C-t>     unite#do_action('tabopen')
+      map <silent><buffer><expr> <C-d>     unite#do_action('cd')
+    endfunction"}}}
+
+
+" ---
+"  do not work at 64bit environment
+" NeoBundle "osyo-manga/vim-snowdrop"
+" " libclang が保存されているディレクトリへのパス
+" let g:snowdrop#libclang_directory = "D:/__trash/clang/build/bin/Release"
+" " インクルードディレクトリのパスを設定
+" let g:snowdrop#include_paths = {
+" \   "c" : [
+" \       "D:/yuki/include",
+" \   ],
+" \   "cpp" : [
+" \       "D:/yuki/include",
+" \       "D:/yuki/include_cpp",
+" \   ],
+" \}
+" " 使用する clang のコマンドオプション
+" let g:snowdrop#command_options = {
+" \   "c" : "-ferror-limit=0",
+" \   "cpp" : "-std=c++1y -ferror-limit=0",
+" \}
+
+" ---------------------------------------------------------
+" clang_complete
+" ---------------------------------------------------------
+NeoBundleLazy 'Rip-Rip/clang_complete', {
+            \ 'autoload' : {'filetypes' : ['c', 'cpp']}
+            \ }
+" autocmd FileType cpp call s:cpp()
+" function! s:cpp()
+"     let g:clang_complete_auto=1
+"     let g:clang_use_library=0
+"     let g:clang_snippets=0
+"     let g:clang_complete_copen = 1
+" endfunction
+
+let g:clan_exec='clang.exe'
+let g:clang_close_preview = 1
+let g:clang_auto_select = 0
+" let g:clang_user_options='-I /usr/local/include -I /usr/local/gcc-4.8.2/include/c++/4.8.2 || exit 0'
+let g:clang_user_options='-ferror-limit=0 -I D:/yuki/include -I D:/yuki/include_cpp || exit 0'
+
+" ---------------------------------------------------------
+" Trinty 3兄弟 (SourceExplorer, taglist, NerdTree)
+" ---------------------------------------------------------
+" " NeoBundle 'wesleyche/SrcExpl'
+" " NeoBundle 'vim-scripts/Trinity'
+" " NeoBundle 'vim-scripts/taglist.vim'
+" taglistだけでいい感じ
+" " nmap <Space>t :TrinityToggleTagList<CR>
+" let Tlist_Show_One_File = 1 "現在編集中のソースのタグしか表示しない
+" let Tlist_Exit_OnlyWindow = 1 "taglist が最後のウインドウなら vim を閉じる
+" "let Tlist_Enable_Fold_Column = 1 " 折り畳み
+" map <silent> <Space>l :TlistToggle<CR>
+" " let g:tlist_php_settings = 'php;c:class;d:constant;f:function'
+
+" ---------------------------------------------------------
+" Ruby 用 色々
+" ---------------------------------------------------------
+" NeoBundle 'tpope/vim-endwise'  " <CR> で 不具合
+
+" def - end などの%での移動 (Rubyは終端が全て end のため難しく，不完全)
+" source $VIMRUNTIME/macros/matchit.vim
+" augroup matchit
+"   au!
+"   au FileType ruby let b:match_words = '\<\(module\|class\|def\|begin\|do\|if\|unless\|case\)\>:\<\(elsif\|when\|rescue\)\>:\<\(else\|ensure\)\>:\<end\>'
+" augroup END
+
+" インデントの設定
+" autocmd FileType ruby call s:ruby()
+" function! s:ruby()
+"     setl tabstop=2
+"     setl shiftwidth=2
+"     setl expandtab
+" endfunction
+
+" NeoBundle 'thinca/vim-ref'
+" let g:ref_use_vimproc=1
+" let g:ref_refe_version=2
+" nmap ,rr :<C-u>Ref refe<Space>
+
+" ---------------------------------------------------------
+" python 用 色々
+" ---------------------------------------------------------
+" autocmd FileType python call s:python()
+" function! s:python()
+"     setl tabstop=4
+"     setl shiftwidth=4
+"     setl expandtab
+"     setl softtabstop=4
+" endfunction
+
+" ---------------------------------------------------------
+" ヘルプ日本語化
+" ---------------------------------------------------------
+NeoBundle 'vim-jp/vimdoc-ja'
+
+NeoBundle 'Shougo/vimfiler.vim'
+noremap <Space>f :VimFiler<Enter>
+noremap <Space>e :VimFilerExplorer<Enter>
+" VimFiler 実行中のキーマップ
+autocmd FileType vimfiler call s:vimfiler_my_settings()
+    function! s:vimfiler_my_settings()"{{{
+      " Overwrite settings.
+      nnoremap <buffer> j k
+      nnoremap <buffer> k j
+      " Runs "split" action by <C-s>.
+      map <silent><buffer><expr> <C-s>     vimfiler#do_action('split')
+      map <silent><buffer><expr> <C-t>     vimfiler#do_action('tabopen')
+      map <silent><buffer><expr> <C-d>     vimfiler#do_action('cd')
+    endfunction"}}}
+
+" NeoBundle 'surround.vim'
+vnoremap <Space>s d<Left><Left>p<Right>xx
+vnoremap <Space>" di""<Esc><Left>p
+vnoremap <Space>( di()<Esc><Left>p
+vnoremap <Space>[ di[]<Esc><Left>p
+vnoremap <Space>{ di{}<Esc><Left>p
+vnoremap <Space>' di''<Esc><Left>p
+vnoremap <Space>` di``<Esc><Left>p
+
+" ---------------------------------------------------------
+" Vim-TeX-suite
+" ---------------------------------------------------------
+" コンパイル：\ll
+" プレビュー：\lv
+" ターゲット：:TTarget
+" if has("win32") || has("win64")
+"     NeoBundle 'gerw/vim-latex-suite'
+"     " IMPORTANT: win32 users will need to have 'shellslash' set so that latex
+"     " can be called correctly.
+"     set shellslash
+"
+"     " IMPORTANT: grep will sometimes skip displaying the file name if you
+"     " search in a singe file. This will confuse Latex-Suite. Set your grep
+"     " program to always generate a file-name.
+"     set grepprg=grep\ -nH\ $*
+"
+"     " OPTIONAL: Starting with Vim 7, the filetype of empty .tex files defaults to
+"     " 'plaintex' instead of 'tex', which results in vim-latex not being loaded.
+"     " The following changes the default filetype back to 'tex':
+"     let g:tex_flavor='latex'
+"
+"     " TIP: if you write your \label's as \label{fig:something}, then if you
+"     " type in \ref{fig: and press <C-n> you will automatically cycle through
+"     " all the figure labels. Very useful!
+"     set iskeyword+=:
+"
+"     let g:Tex_AutoFolding = 0
+"     " :TTarget dvi がデフォルト
+"     let g:Tex_CompileRule_dvi = 'platex $*'
+" "     let g:Tex_CompileRule_ps = 'dvips -Ppdf -t a4 -o $*.ps $*.dvi'
+"     let g:Tex_CompileRule_pdf = 'dvipdfmx -V7 $*.dvi'
+"     let g:Tex_BibtexFlavor = 'pbibtex -kanji=utf8'
+" "     let g:Tex_MakeIndexFlavor = 'mendex -U $*.idx'  
+" "     let g:Tex_ViewRule_ps = 'C:/Program Files (x86)/SumatraPDF/SumatraPDF.exe -reuse-instance'
+"     let g:Tex_ViewRule_pdf = 'C:/Program Files (x86)/Adobe/Reader 11.0/Reader/AcroRd32.exe'
+"     " スペースホルダへの移動：デフォルトで C-j のマッピングを変更
+"     imap <C-space> <Plug>IMAP_JumpForward
+"     " ターゲットの変更を :TTp や :TTd で．ユーザコマンド
+"     command TTp TTarget pdf
+"     command TTd TTarget dvi
+" endif
+
+" NeoBundle 'justmao945/vim-clang'
+"         let g:clang_auto = 0
+" " let g:clang_include_sysheaders = 0
+"         let g:clang_c_completeopt = 'menuone,preview'
+"         let g:clang_cpp_completeopt = 'menuone,preview'
+
+"  ----------------------------------------------------------------- my bundles
+call neobundle#end()
+
+" Required:
+filetype plugin indent on
+
+" If there are uninstalled bundles found on startup,
+" this will conveniently prompt you to install them.
+NeoBundleCheck
+
+" read local vimrc file
+if filereadable($HOME."/.vimrc_local")
+    source $HOME/.vimrc_local
+endif
+
+setl path+=/usr/local/include
+
