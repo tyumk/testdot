@@ -2,7 +2,6 @@ set nocompatible
 scriptencoding utf-8
 syntax on
 " set cursorline
-" set expandtab
 set tabstop=4
 set shiftwidth=4
 let &t_ti.="\e[1 q"
@@ -11,63 +10,42 @@ let &t_EI.="\e[1 q"
 let &t_te.="\e[0 q"
 
 " カーソル移動
-noremap j <Left>zv
-noremap k gj
-noremap i gk
+noremap h <Left>zv
+noremap j gj
+noremap k gk
 noremap l <Right>zv
 noremap <Down> gj
 noremap <Up>   gk
-noremap h ^
-noremap e <End>
-noremap I 20gk
-noremap J 10<Left>
-noremap K 20gj
+" noremap [ ^
+" noremap ] <End>
+noremap <C-a> <Home>
+noremap <C-e> <End>
+noremap K 20gk
+noremap H 10<Left>
+noremap J 20gj
 noremap L 10<Right>
 
-inoremap <C-i> <Up>
-inoremap <C-j> <Left>
-inoremap <C-k> <Down>
-inoremap <C-l> <Right>
-" inoremap <C-h> <Home>
+inoremap <C-p> <Up>
+inoremap <C-b> <Left>
+inoremap <C-n> <Down>
+inoremap <C-f> <Right>
+inoremap <C-a> <Home>
 inoremap <C-e> <End>
 inoremap <C-d> <Del>
-
-inoremap <C-s> <ESC>
-noremap s i
-noremap S I
-
-noremap t r
-noremap T R
-
-noremap r b
-noremap R B
-
-noremap c y
-noremap C Y
-
-noremap y t
-noremap Y T
-
-" スクロール
-noremap <CR> <C-f>
-noremap <BS> <C-b>
-noremap <s-tAB> <C-y>
-noremap <TAB> <C-e>
 
 " カーソル位置の単語選択
 noremap o viw
 
-" タブで開く
-noremap <C-t> <C-w>gf
-
-" surround
-vnoremap <Space>s d<Left><Left>p<Right>xx
-vnoremap <Space>" di""<Esc><Left>p
-vnoremap <Space>( di()<Esc><Left>p
-vnoremap <Space>[ di[]<Esc><Left>p
-vnoremap <Space>{ di{}<Esc><Left>p
-vnoremap <Space>' di''<Esc><Left>p
-vnoremap <Space>` di``<Esc><Left>p
+"----------------------------------------
+" vimfilesのpath
+"----------------------------------------
+if isdirectory($HOME.'/.vim')
+    let $VIMFILES = $HOME.'/.vim'
+elseif isdirectory($HOME.'\vimfiles')
+    let $VIMFILES = $HOME.'\vimfiles'
+elseif isdirectory($VIM.'\vimfiles')
+    let $VIMFILES = $VIM.'\vimfiles'
+endif
 
 "----------------------------------------
 " エンコーディング指定
@@ -87,10 +65,10 @@ set fileencoding=utf-8
 " バックアップは上書きに成功した後に削除される。
 set writebackup
 " バックアップ/スワップファイルを作成する/しない
-set backup
+set nobackup
 
-set directory=~/.vim/temp
-set backupdir=~/.vim/temp
+set directory=$VIMFILES/temp
+set backupdir=$VIMFILES/temp
 
 " クリップボードを共有
 set clipboard=unnamed,autoselect
@@ -196,56 +174,148 @@ function! s:Byte2hex(bytes)
     return join(map(copy(a:bytes), 'printf("%02X", v:val)'), '')
 endfunction
 
-""""""""""""""""""""""""""""""
-" 挿入モード時、ステータスラインのカラー変更
-""""""""""""""""""""""""""""""
-let g:hi_insert = 'highlight StatusLine guifg=darkblue guibg=darkyellow gui=none ctermfg=blue ctermbg=yellow cterm=none'
+"----------------------------------------
+"  Shougo/neobundle
+"----------------------------------------
+if has('vim_starting')
+   "set nocompatible               " Be iMproved
 
-if has('syntax')
-    augroup InsertHook
-        autocmd!
-        autocmd InsertEnter * call s:StatusLine('Enter')
-        autocmd InsertLeave * call s:StatusLine('Leave')
-    augroup END
+   " Required:
+   set runtimepath+=~/.vim/bundle/neobundle.vim/
 endif
-" if has('unix') && !has('gui_running')
-"   " ESCですぐに反映されない対策
-"   inoremap <silent> <ESC> <ESC>
-" endif
 
-let s:slhlcmd = ''
-function! s:StatusLine(mode)
-    if a:mode == 'Enter'
-        silent! let s:slhlcmd = 'highlight ' . s:GetHighlight('StatusLine')
-        silent exec g:hi_insert
-    else
-        highlight clear StatusLine
-        silent exec s:slhlcmd
-        redraw
-    endif
-endfunction
+" Required:
+call neobundle#begin(expand('~/.vim/bundle/'))
 
-function! s:GetHighlight(hi)
-    redir => hl
-    exec 'highlight '.a:hi
-    redir END
-    let hl = substitute(hl, '[\r\n]', '', 'g')
-    let hl = substitute(hl, 'xxx', '', '')
-    return hl
-endfunction
+" Let NeoBundle manage NeoBundle
+" Required:
+NeoBundleFetch 'Shougo/neobundle.vim'
+
+" -------------------------------------------------------------------
+" My Bundles here:
+" Refer to |:NeoBundle-examples|.
+" Note: You don't set neobundle setting in .gvimrc!
 
 " ---------------------------------------------------------
-" caw
+" コメントアウト Space , c でコメントをつけたり消したり
 " ---------------------------------------------------------
-" NeoBundle 'tyru/caw.vim'
+NeoBundle 'tyru/caw.vim'
 map <Space>c <Plug>(caw:I:toggle)
+
+" ---------------------------------------------------------
+" neocomplete 補完
+" ---------------------------------------------------------
+" NeoBundle 'Shougo/neocomplete'
+" 
+" "Note: This option must set it in .vimrc(_vimrc).  NOT IN .gvimrc(_gvimrc)!
+" " Disable AutoComplPop.
+" let g:acp_enableAtStartup = 0
+" " Use neocomplete.
+" let g:neocomplete#enable_at_startup = 1
+" " Use smartcase.
+" let g:neocomplete#enable_smart_case = 1
+" " Set minimum syntax keyword length.
+" let g:neocomplete#sources#syntax#min_keyword_length = 3
+" let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
+" 
+" " Define dictionary.
+" let g:neocomplete#sources#dictionary#dictionaries = {
+"     \ 'default' : '',
+"     \ 'vimshell' : $HOME.'/.vimshell_hist',
+"     \ 'scheme' : $HOME.'/.gosh_completions',
+"     \ 'ruby' : $HOME.'/.vim/dict/ruby.dict'
+"         \ }
+" 
+" " Define keyword.
+" if !exists('g:neocomplete#keyword_patterns')
+"     let g:neocomplete#keyword_patterns = {}
+" endif
+" let g:neocomplete#keyword_patterns['default'] = '\h\w*'
+" 
+" " Plugin key-mappings.
+" inoremap <expr><C-g>     neocomplete#undo_completion()
+" inoremap <expr><C-@>     neocomplete#complete_common_string()
+" 
+" " Recommended key-mappings.
+" " <CR>: close popup and save indent.
+" inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+" function! s:my_cr_function()
+"   return neocomplete#close_popup() . "\<CR>"
+"   " For no inserting <CR> key.
+"   "return pumvisible() ? neocomplete#close_popup() : "\<CR>"
+" endfunction
+" " <TAB>: completion.
+" " inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+" " inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<S-TAB>"
+" " <C-h>, <BS>: close popup and delete backword char.
+" inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
+" inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
+" inoremap <expr><C-y>  neocomplete#close_popup()
+" inoremap <expr><C-e>  neocomplete#cancel_popup()
+" " Close popup by <Space>.
+" "inoremap <expr><Space> pumvisible() ? neocomplete#close_popup() : "\<Space>"
+" 
+" " For cursor moving in insert mode(Not recommended)
+" "inoremap <expr><Left>  neocomplete#close_popup() . "\<Left>"
+" "inoremap <expr><Right> neocomplete#close_popup() . "\<Right>"
+" "inoremap <expr><Up>    neocomplete#close_popup() . "\<Up>"
+" "inoremap <expr><Down>  neocomplete#close_popup() . "\<Down>"
+" " Or set this.
+" "let g:neocomplete#enable_cursor_hold_i = 1
+" " Or set this.
+" "let g:neocomplete#enable_insert_char_pre = 1
+" 
+" " AutoComplPop like behavior.
+" "let g:neocomplete#enable_auto_select = 1
+" 
+" " Shell like behavior(not recommended).
+" "set completeopt+=longest
+" "let g:neocomplete#enable_auto_select = 1
+" "let g:neocomplete#disable_auto_complete = 1
+" "inoremap <expr><TAB>  pumvisible() ? "\<Down>" : "\<C-x>\<C-u>"
+" 
+" " Enable omni completion.
+" " autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+" " autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+" " autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+" " autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+" " autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+" 
+" " Enable heavy omni completion.
+" if !exists('g:neocomplete#sources#omni#input_patterns')
+"   let g:neocomplete#sources#omni#input_patterns = {}
+" endif
+" "let g:neocomplete#sources#omni#input_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
+" " let g:neocomplete#sources#omni#input_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
+" " let g:neocomplete#sources#omni#input_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
+" let g:neocomplete#sources#omni#input_patterns.ruby = '[^. *\t]\.\w*\|\h\w*::'
+" " For perlomni.vim setting.
+" " https://github.com/c9s/perlomni.vim
+" let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
+" 
+" if !exists('g:neocomplete#force_omni_input_patterns')
+"   let g:neocomplete#force_omni_input_patterns = {}
+" endif
+" let g:neocomplete#force_overwrite_completefunc = 1
+" let g:neocomplete#force_omni_input_patterns.c =
+"       \ '[^.[:digit:] *\t]\%(\.\|->\)\w*'
+" let g:neocomplete#force_omni_input_patterns.cpp =
+"       \ '[^.[:digit:] *\t]\%(\.\|->\)\w*\|\h\w*::\w*'
+" " let g:neocomplete#force_omni_input_patterns.objc =
+" "       \ '\[\h\w*\s\h\?\|\h\w*\%(\.\|->\)'
+" " let g:neocomplete#force_omni_input_patterns.objcpp =
+" "       \ '\[\h\w*\s\h\?\|\h\w*\%(\.\|->\)\|\h\w*::\w*'
+" ---------------------------------------------------------
+" vim-clang
+" ---------------------------------------------------------
+NeoBundle 'justmao945/vim-clang'
 
 " ---------------------------------------------------------
 " Unite
 " ---------------------------------------------------------
-" NeoBundle 'Shougo/unite.vim'
-" NeoBundle 'Shougo/neomru.vim'
-" NeoBundle 'Shougo/unite-outline'
+NeoBundle 'Shougo/unite.vim'
+NeoBundle 'Shougo/neomru.vim'
+NeoBundle 'Shougo/unite-outline'
 " The prefix key.
 nnoremap    [unite]   <Nop>
 nmap    <Space> [unite]
@@ -269,8 +339,6 @@ nnoremap <silent> [unite]r  :<C-u>Unite
 autocmd FileType unite call s:unite_my_settings()
     function! s:unite_my_settings()"{{{
       " Overwrite settings.
-      nnoremap <buffer> j k
-      nnoremap <buffer> k j
       " Runs "split" action by <C-s>.
       map <silent><buffer><expr> <C-s>     unite#do_action('split')
       map <silent><buffer><expr> <C-t>     unite#do_action('tabopen')
@@ -278,76 +346,22 @@ autocmd FileType unite call s:unite_my_settings()
     endfunction"}}}
 
 " ---------------------------------------------------------
-" VimFiler
-" ---------------------------------------------------------
-NeoBundle 'Shougo/vimfiler.vim'
-noremap <Space>f :VimFiler<Enter>
-noremap <Space>e :VimFilerExplorer<Enter>
-" VimFiler 実行中のキーマップ
-autocmd FileType vimfiler call s:vimfiler_my_settings()
-    function! s:vimfiler_my_settings()"{{{
-      " Overwrite settings.
-      nnoremap <buffer> j k
-      nnoremap <buffer> k j
-      " Runs "split" action by <C-s>.
-      map <silent><buffer><expr> <C-s>     vimfiler#do_action('split')
-      map <silent><buffer><expr> <C-t>     vimfiler#do_action('tabopen')
-      map <silent><buffer><expr> <C-d>     vimfiler#do_action('cd')
-    endfunction"}}}
-
-" ---------------------------------------------------------
 " ヘルプ日本語化
 " ---------------------------------------------------------
-" NeoBundle 'vim-jp/vimdoc-ja'
+NeoBundle 'vim-jp/vimdoc-ja'
+
+"  ----------------------------------------------------------------- my bundles
+call neobundle#end()
+
+" Required:
+filetype plugin indent on
+
+" If there are uninstalled bundles found on startup,
+" this will conveniently prompt you to install them.
+NeoBundleCheck
 
 " read local vimrc file
 if filereadable($HOME."/.vimrc_local")
     source $HOME/.vimrc_local
 endif
 
-
-
-" ---------------------------------------------------------
-" clang_complete
-" ---------------------------------------------------------
-" NeoBundleLazy 'Rip-Rip/clang_complete', {
-"             \ 'autoload' : {'filetypes' : ['c', 'cpp']}
-"             \ }
-" " autocmd FileType cpp call s:cpp()
-" " function! s:cpp()
-" "     let g:clang_complete_auto=1
-" "     let g:clang_use_library=0
-" "     let g:clang_snippets=0
-" "     let g:clang_complete_copen = 1
-" " endfunction
-"
-" let g:clan_exec='clang.exe'
-" let g:clang_close_preview = 1
-" let g:clang_auto_select = 0
-" " let g:clang_user_options='-I /usr/local/include -I /usr/local/gcc-4.8.2/include/c++/4.8.2 || exit 0'
-" let g:clang_user_options='-I D:/yuki/include -I D:/yuki/include_cpp || exit 0'
-" " ---------------------------------------------------------
-" " snippet
-" " ---------------------------------------------------------
-" " NeoBundle 'Shougo/neosnippet'
-" " NeoBundle 'Shougo/neosnippet-snippets'
-" " " スニペットを展開するキーマッピング
-" " " <Tab> で選択されているスニペットの展開を行う
-" " " 選択されている候補がスニペットであれば展開し、
-" " " それ以外であれば次の候補を選択する
-" " " また、既にスニペットが展開されている場合は次のマークへと移動する
-" " imap <expr><CR> neosnippet#expandable_or_jumpable() ?
-" " \ "\<Plug>(neosnippet_expand_or_jump)"
-" " \: "\<CR>"
-" " " \: pumvisible() ? "\<C-n>" : "\<CR>"
-" " smap <expr><CR> neosnippet#expandable_or_jumpable() ?
-" " \ "\<Plug>(neosnippet_expand_or_jump)"
-" " \: "\<CR>"
-" "
-" " " 現在の filetype のスニペットを編集する為のキーマッピング
-" " " こうしておくことでサッと編集や追加などを行うことができる
-" " " 以下の設定では新しいタブでスニペットファイルを開く
-" " " nnoremap <Space>ns :execute "tabnew\|:NeoSnippetEdit ".&filetype<CR>
-" "
-" " " スニペットファイルの保存ディレクトリを設定
-" " " let g:neosnippet#snippets_directory = "~/.neosnippet"
