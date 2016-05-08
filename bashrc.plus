@@ -1,0 +1,7 @@
+shopt -s autocd
+shopt -s extglob
+shopt -s globstar
+export HISTSIZE=10000
+export HISTFILESIZE=10000
+alias rmc="cat | sed -r \"s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g\""
+export PS1='\[\e[1;32m\][\u@\h] $(pwd)\[\e[m\]\n$ '
