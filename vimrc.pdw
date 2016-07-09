@@ -365,3 +365,8 @@ if filereadable($HOME."/.vimrc_local")
     source $HOME/.vimrc_local
 endif
 
+" grepでQuickfixを開く
+autocmd QuickFixCmdPost *grep* cwindow
+
+" 開いているファイルにカレントディレクトリを追従させる
+set autochdir
